@@ -35,6 +35,10 @@ public class RoomOccupancyService {
         final var premiumGuests = new ArrayList<BigDecimal>();
         final var economyGuests = new ArrayList<BigDecimal>();
 
+        final var enoughEconomyRooms = POTENTIAL_GUESTS.stream()
+            .filter(this::isEconomy)
+            .count() <= availableEconomyRooms;
+
         POTENTIAL_GUESTS.stream()
             .sorted(reverseOrder())
             .forEach(price -> {
@@ -43,7 +47,9 @@ public class RoomOccupancyService {
                         premiumGuests.add(price);
                     }
                 } else {
-                    if (economyGuests.size() < availableEconomyRooms) {
+                    if (premiumGuests.size() < availablePremiumRooms && !enoughEconomyRooms) {
+                        premiumGuests.add(price);
+                    } else if (economyGuests.size() < availableEconomyRooms) {
                         economyGuests.add(price);
                     }
                 }
